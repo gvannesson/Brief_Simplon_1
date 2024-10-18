@@ -2,10 +2,10 @@
 
 #import du JSON
 import json
-with open('employes-data.json', 'r') as fichier:
+with open('employes_data_test.json', 'r') as fichier:
     donnees = json.load(fichier)
 
-
+branch_list = [key for key in donnees.keys()]
 
 def branch_data_extract() -> list:
     """
@@ -28,7 +28,6 @@ def branch_data_extract() -> list:
     return(workers_list)
 
 workers_list = branch_data_extract()
-
 #calcul salaire mensuel
 def worker_name_and_salary_function(data: list) -> list:
     """
@@ -53,7 +52,6 @@ def worker_name_and_salary_function(data: list) -> list:
     return(worker_name_and_salary)
 
 worker_name_and_salary_list = worker_name_and_salary_function(workers_list)
-
 
 def average_salary(data: list) -> list:
     """
@@ -84,8 +82,9 @@ def branch_average_salary(data: list) -> list: #worker name and salary list
     Sort une liste avec pour chaque filiale, le salaire moyen, le salaire max et le salaire min
     """
     branch_list = [] #extraction des noms de filiale du json
-    for key in donnees.keys():
-        branch_list.append(key)
+    for worker in data:
+        if worker[3] not in branch_list:
+            branch_list.append(worker[3])
 
     salary_list_by_branch = []
     for branch in branch_list:
@@ -101,7 +100,8 @@ def branch_average_salary(data: list) -> list: #worker name and salary list
                      max = key[2]
                 if key[2]<min:
                     min = key[2]
-        salary_list_by_branch.append((branch,max, min, round(somme/effectif,1))) #liste avec des tuples contenant le nom de la filière, le salaire max, min et moyen)
+
+        salary_list_by_branch.append((branch,max, min, round(somme/effectif,1))) #liste avec des tuples contenant le nom de la filiale, le salaire max, min et moyen)
     return(salary_list_by_branch)
 
 
@@ -134,9 +134,9 @@ def affichage_stat_salariale_filiale():
     aucun    
 
     """
-    wished_branch = input("Inscrivez le nom de la filiale dont vous souhaitez obtenir les statistiques salariales\n\
-TechCorp, DesignWorks ou ProjectLead \nExit pour sortir : ")
-    if wished_branch in donnees.keys():
+    wished_branch = input(f"Inscrivez le nom de la filiale dont vous souhaitez obtenir les statistiques salariales\n\
+{", ".join(branch_list)} \nExit pour sortir : ")
+    if wished_branch in branch_list:
         print(f"\n\n !!! Attention données confidentielles !!! \n\nFiliale: {wished_branch}\n")
         liste_de_la_filiale = []
         for worker in worker_name_and_salary_list:
@@ -161,7 +161,7 @@ TechCorp, DesignWorks ou ProjectLead \nExit pour sortir : ")
     elif wished_branch == "Exit":
         return
     else:
-        print("Cette entrée n'est pas valable")
+        print("Cette entrée n'est pas valable\n\n")
         affichage_stat_salariale_filiale()
 
 
